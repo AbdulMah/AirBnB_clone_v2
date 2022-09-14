@@ -16,9 +16,5 @@ class Review(BaseModel):
     text = ''
 
     def __init__(self, *args, **kwargs):
-        if len(kwargs) == 0:
-            super().__init__()
-
-        # if kwargs have values
-        if len(kwargs) > 0:
-            super().__init__(**kwargs)
+        """initializes Review"""
+        super().__init__(*args, **kwargs)
