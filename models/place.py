@@ -63,10 +63,7 @@ class Place(BaseModel, Base):
     amenities = relationship("Amenity", secondary="place_amenity", viewonly=False)
     amenity_ids = []
 
-    def __init__(self, *args, **kwargs):
-        """initializes Place"""
-        super().__init__(*args, **kwargs)
-        
+    
     if getenv("HBNB_TYPE_STORAGE", None) != "db":
         @property
         def reviews(self):
