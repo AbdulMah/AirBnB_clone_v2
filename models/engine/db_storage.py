@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 """Defines the DBStorage engine."""
 from os import getenv
-from models.base_model import Base
-from models.base_model import BaseModel
+from models.base_model import Base, BaseModel
 from models.amenity import Amenity
 from models.city import City
 from models.place import Place
@@ -42,7 +41,7 @@ class DBStorage:
             Dict of queried classes in the format <class name>.<obj id> = obj.
         """
         if cls is None:
-            objs = self.__session.query(State).all()
+            objs.extend(self.__session.query(State).all())
             objs.extend(self.__session.query(City).all())
             objs.extend(self.__session.query(User).all())
             objs.extend(self.__session.query(Place).all())
