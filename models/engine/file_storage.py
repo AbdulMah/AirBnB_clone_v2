@@ -25,24 +25,17 @@ class FileStorage:
     __file_path = "file.json"
     # dictionary - empty but will store all objects by <class name>.id
     __objects = {}
+    
+    def all(self):
+        """ returns the dictionary __objects """
+        return FileStorage.__objects
 
     def all(self, cls=None):
-        '''
-            Return the dictionary
-        '''
-        fs_objects = {}
-        if cls:
-            if type(cls) is str and cls in classes:
-                for key, val in self.__objects.items():
-                    if cls == key.split('.')[0]:
-                        fs_objects[key] = val
-            elif cls.__name__ in classes:
-                for key, val in self.__objects.items():
-                    if cls.__name__ == key.split('.')[0]:
-                        fs_objects[key] = val
-        else:
-            return self.__objects
-        return fs_objects
+        """Devuelve un diccionario de modelos actualmente almacenados"""
+        if cls is None:
+            return FileStorage.__objects
+        return {k: v for k, v in FileStorage.__objects.items()
+                if type(v) == cls}
 
     def new(self, obj):
         '''
@@ -80,9 +73,9 @@ class FileStorage:
         """
         if obj is not None:
             key = obj.__class__.__name__ + "." + str(obj.id)
-            if key in self.__objects:
-                del self.__objects[key]
-        self.save()
+            if key in FileStorage.__objects:
+                del FileStorage.__objects[key]
+        
         
     def close(self):
         """call reload() method for deserializing the JSON file to objects"""
