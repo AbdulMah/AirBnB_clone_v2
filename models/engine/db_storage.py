@@ -41,7 +41,7 @@ class DBStorage:
             Dict of queried classes in the format <class name>.<obj id> = obj.
         """
         if cls is None:
-            objs.extend(self.__session.query(State).all())
+            objs = self.__session.query(State).all()
             objs.extend(self.__session.query(City).all())
             objs.extend(self.__session.query(User).all())
             objs.extend(self.__session.query(Place).all())
