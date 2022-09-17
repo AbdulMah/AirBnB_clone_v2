@@ -10,6 +10,7 @@ from sqlalchemy import String
 
 Base = declarative_base()
 
+
 class BaseModel:
     """Defines the BaseModel class.
 
@@ -52,19 +53,33 @@ class BaseModel:
         Includes the key/value pair __class__ representing
         the class name of the object.
         """
-        my_dict = self.__dict__.copy()
-        my_dict["__class__"] = str(type(self).__name__)
-        my_dict["created_at"] = self.created_at.isoformat()
-        my_dict["updated_at"] = self.updated_at.isoformat()
-        my_dict.pop("_sa_instance_state", None)
-        return my_dict
+
+        def to_dict(self):
+            """
+            custom representation of a model
+        """
+        custom = self.__dict__.copy()
+        custom_dict = {}
+        custom_dict.update({"__class__": self.__class__.__name__})
+        for key in list(custom):
+            if key in ("created_at", "updated_at"):
+                custom_dict.update({key: getattr(self, key).isoformat()})
+            elif key == "_sa_instance_state":
+                custom.pop(key)
+            else:
+                custom_dict.update({key: getattr(self, key)})
+        return custom_dict
 
     def delete(self):
-        """Delete the current instance from storage."""
-        models.storage.delete(self)
+        """ delete the current instance from the storage
+        """
+        k = "{}.{}".format(type(self).__name__, self.id)
+        del models.storage.__objects[k]
 
     def __str__(self):
-        """Return the print/str representation of the BaseModel instance."""
-        d = self.__dict__.copy()
-        d.pop("_sa_instance_state", None)
-        return "[{}] ({}) {}".format(type(self).__name__, self.id, d)
+        """
+            return string representation of a Model
+        """
+        return "[{}] ({}) {}".format(self.__class__.__name__,
+                                     self.id, 
+                                     self.__dict__)
