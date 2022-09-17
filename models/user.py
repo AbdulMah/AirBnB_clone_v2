@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """This module contains a class called User that inherits from 'BaseModel'
 """
+from os import getenv
 from models.base_model import BaseModel
 from models.base_model import Base
 from sqlalchemy import Column, String
@@ -21,12 +22,18 @@ class User(BaseModel, Base):
         places (sqlalchemy relationship): The User-Place relationship.
         reviews (sqlalchemy relationship): The User-Review relationship.
     """
-    __tablename__ = "users"
-    
-    email = Column(String(128), nullable=False)
-    password = Column(String(128), nullable=False)
-    first_name = Column(String(128))
-    last_name = Column(String(128))
-    places = relationship("Place", backref="user", cascade="delete")
-    reviews = relationship("Review", backref="user", cascade="delete")
+    if getenv("HBNB_TYPE_STORAGE") == "db":
+        __tablename__ = "users"
+        
+        email = Column(String(128), nullable=False)
+        password = Column(String(128), nullable=False)
+        first_name = Column(String(128))
+        last_name = Column(String(128))
+        places = relationship("Place", backref="user", cascade="delete")
+        reviews = relationship("Review", backref="user", cascade="delete")
+    else: 
+        email = ''
+        password = ''
+        first_name = ''
+        last_name = ''
  

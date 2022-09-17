@@ -81,5 +81,5 @@ class BaseModel:
             return string representation of a Model
         """
         return "[{}] ({}) {}".format(self.__class__.__name__,
-                                     self.id, 
+                                     self.id,
                                      self.__dict__)
