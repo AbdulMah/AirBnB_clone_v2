@@ -4,6 +4,7 @@ Contains the FileStorage class
 """
 
 import json
+import models
 from models.amenity import Amenity
 from models.base_model import BaseModel
 from models.city import City
@@ -52,10 +53,11 @@ class FileStorage:
                    "Place": Place, "Review": Review, "State": State, "User": User}
 
         try:
-            with open(self.__file_path, 'r') as f:
-                jo = json.load(f)
-            for key in jo:
-                self.__objects[key] = classes[jo[key]["__class__"]](**jo[key])
+            with open(self.__file_path, "r") as json_file:
+                temp = json.load(json_file)
+            for id, dict in temp.items():
+                temp_instance = models.dummy_classes[dict["__class__"]](**dict)
+                self.__objects[id] = temp_instance
         except:
             pass
 
