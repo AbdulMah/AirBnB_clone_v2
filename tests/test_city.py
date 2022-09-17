@@ -5,20 +5,20 @@ from models.city import City
 
 
 class test_City(test_basemodel):
-    """ """
+    """ city """
 
     def __init__(self, *args, **kwargs):
-        """ """
+        """ a """
         super().__init__(*args, **kwargs)
         self.name = "City"
         self.value = City
 
-    def test_state_id(self):
-        """ """
+    def stateid(self):
+        """ b """
         new = self.value()
         self.assertEqual(type(new.state_id), str)
 
-    def test_name(self):
-        """ """
+    def name(self):
+        """ c """
         new = self.value()
         self.assertEqual(type(new.name), str)
