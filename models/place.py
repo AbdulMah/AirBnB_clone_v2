@@ -3,18 +3,13 @@
 Place module
 This module have and manage Place Entity
 """
-from models.base_model import BaseModel
-import models
+
 from os import getenv
-from models.base_model import Base
+import models
+from models.base_model import Base, BaseModel
 from models.amenity import Amenity
 from models.review import Review
-from sqlalchemy import Column
-from sqlalchemy import Float
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy import Table
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
 
 
@@ -49,6 +44,7 @@ class Place(BaseModel, Base):
         amenity_ids (list): An id list of all linked amenities.
     """
     __tablename__ = "places"
+    
     city_id = Column(String(60), ForeignKey("cities.id"), nullable=False)
     user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
     name = Column(String(128), nullable=False)
