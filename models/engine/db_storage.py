@@ -37,26 +37,27 @@ class DBStorage():
 
         if getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
-
     def all(self, cls=None):
-        """
-        current database session query
-        """
-        new_dict = {}
+        """Query on the curret database session all objects of the given class.
 
-        if not cls:
-            for a_class in class_list:
-                for obj in self.__session.query(a_class):
-                    k = obj.__class__.__name__, obj.id
-                    new_dict[k] = obj
+        If cls is None, queries all types of objects.
+
+        Return:
+            Dict of queried classes in the format <class name>.<obj id> = obj.
+        """
+        if cls is None:
+            objs = self.__session.query(State).all()
+            objs.extend(self.__session.query(City).all())
+            objs.extend(self.__session.query(User).all())
+            objs.extend(self.__session.query(Place).all())
+            objs.extend(self.__session.query(Review).all())
+            objs.extend(self.__session.query(Amenity).all())
         else:
-            if type(cls) is str:
-                cls = models.classes[cls]
-            query = self.__session.query(cls)
-            for obj in query:
-                k = obj.__class__.__name__, obj.id
-                new_dict[k] = obj
-        return new_dict
+            if type(cls) == str:
+                cls = eval(cls)
+            objs = self.__session.query(cls)
+        return {"{}.{}".format(type(o).__name__, o.id): o for o in objs}
+
 
     def new(self, obj):
         """
@@ -93,4 +94,4 @@ class DBStorage():
         """
         close session
         """
-        self.__session.remove()
+        self.__session.close()
