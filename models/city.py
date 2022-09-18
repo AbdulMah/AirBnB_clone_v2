@@ -14,7 +14,10 @@ class City(BaseModel, Base):
         Define the class City that inherits from BaseModel.
     '''
     __tablename__ = "cities"
-
-    name = Column(String(128), nullable=False)
-    state_id = Column(String(60), ForeignKey("states.id"), nullable=False)
-    places = relationship("Place", backref="cities", cascade="delete")
+    if environ.get("HBNB_TYPE_STORAGE") == "db":
+        name = Column(String(128), nullable=False)
+        state_id = Column(String(60), ForeignKey("states.id"), nullable=False)
+        places = relationship("Place", backref="cities", cascade="delete")
+    else:
+        name = ""
+        state_id = ""

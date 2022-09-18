@@ -10,7 +10,7 @@ from os import environ
 
 class User(BaseModel, Base):
     '''
-        Implementation for the User
+        Definition of the User class
     '''
     __tablename__ = 'users'
     email = Column(String(128), nullable=False)
