@@ -1,17 +1,19 @@
 #!/usr/bin/python3
-'''
+"""
     Implementation of the Review class
-'''
-from models.base_model import BaseModel, Base
+"""
+
+
+from os import environ
 from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
-from os import environ
+from models.base_model import BaseModel, Base
 
 
 class Review(BaseModel, Base):
-    '''
+    """
         Implementation for the Review.
-    '''
+    """
     
     if environ.get("HBNB_TYPE_STORAGE") == "db":
         __tablename__ = "reviews"

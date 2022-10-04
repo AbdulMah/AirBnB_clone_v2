@@ -2,13 +2,12 @@
 '''
     Implementation of the State class
 '''
-
-from models.base_model import BaseModel, Base
+from os import environ
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-from models.city import City
-from os import environ
 import models
+from models.base_model import BaseModel, Base
+
 
 
 class State(BaseModel, Base):
@@ -25,6 +24,9 @@ class State(BaseModel, Base):
 
         @property
         def cities(self):
+            """
+                Getter
+            """
             city_dict = models.storage.all(models.classes["City"])
             city_list = []
 

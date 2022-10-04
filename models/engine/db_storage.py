@@ -1,9 +1,12 @@
 #!/usr/bin/python3
 """DBStorage class for AirBnB"""
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session, scoped_session, relationship
+
 from os import getenv
-from models.base_model import BaseModel, Base
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm.session import Session
+from models.base_model import Base
 from models.user import User
 from models.state import State
 from models.city import City
@@ -43,8 +46,6 @@ class DBStorage():
             objs = []
             for _class in classes:
                 objs += self.__session.query(_class)
-
-        """create and save data"""
         new_dict = {}
 
         for obj in objs:

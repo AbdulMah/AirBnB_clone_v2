@@ -1,27 +1,37 @@
 #!/usr/bin/python3
-'''
+"""
     Define the class Place.
-'''
-from models.base_model import BaseModel, Base
-from models import amenity
-from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, \
-    Float, Table
-from sqlalchemy.orm import relationship
+"""
+
+
 from os import environ
+from sqlalchemy import Column
+from sqlalchemy import String
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import DateTime
+from sqlalchemy import Float
+from sqlalchemy import Table
+from sqlalchemy.orm import relationship
+from models import amenity
+from models.base_model import BaseModel, Base
+
 
 place_amenity = Table("place_amenity", Base.metadata,
-                      Column("place_id", String(60),
-                             ForeignKey("places.id"), nullable=False),
-                      Column("amenity_id", String(60),
-                             ForeignKey("amenities.id"), nullable=False))
+                      Column("place_id",
+                             String(60),
+                             ForeignKey("places.id"),
+                             nullable=False),
+                      Column("amenity_id",
+                             String(60),
+                             ForeignKey("amenities.id"),
+                             nullable=False))
 
 
 class Place(BaseModel, Base):
-    '''
+    """
         Define the class Place that inherits from BaseModel.
-    '''
-
-    
+    """
 
     if environ.get("HBNB_TYPE_STORAGE") == "db":
         __tablename__ = "places"
@@ -42,12 +52,15 @@ class Place(BaseModel, Base):
 
         @property
         def reviews(self):
+            """
+                Getter
+            """
             matching_reviews = []
             for review in self.reviews:
                 if review.place_id == self.id:
                     matching_reviews.append(review)
-
             return (matching_reviews)
+
     else:
         city_id = ""
         user_id = ""
@@ -63,9 +76,15 @@ class Place(BaseModel, Base):
 
         @property
         def amenities(self):
+            """
+                Getter
+            """
             return (self.amenity_ids)
 
         @amenities.setter
         def amenities(self, value):
-            if type(value) == amenity.Amenity:
+            """
+                Setter
+            """
+            if isinstance(value, amenity.Amenity):
                 self.amenity_ids.append(value.id)

@@ -8,13 +8,6 @@ import shlex
 import os
 from models.engine.file_storage import FileStorage
 from models.engine.db_storage import DBStorage
-from models.base_model import BaseModel
-from models.user import User
-from models.place import Place
-from models.state import State
-from models.city import City
-from models.review import Review
-from models.amenity import Amenity
 
 
 class HBNBCommand(cmd.Cmd):
@@ -31,16 +24,16 @@ class HBNBCommand(cmd.Cmd):
         return True
 
     def do_EOF(self, args):
-        '''
+        """
             Exits after receiving the EOF signal.
-        '''
+        """
         return True
 
     def do_create(self, args):
-        '''
+        """
             Create a new instance of class BaseModel and saves it
             to the JSON file.
-        '''
+        """
         if len(args) == 0:
             print("** class name missing **")
             return
@@ -61,7 +54,7 @@ class HBNBCommand(cmd.Cmd):
                                 v = float(v)
                             except:
                                 pass
-
+                            
                     setattr(new_instance, k, v)
                 except Exception:
                     continue
