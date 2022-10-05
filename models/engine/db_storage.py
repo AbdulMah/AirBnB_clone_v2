@@ -5,7 +5,7 @@ from os import getenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm.session import Session
+from sqlalchemy.orm import Session
 from models.base_model import Base
 from models.user import User
 from models.state import State
