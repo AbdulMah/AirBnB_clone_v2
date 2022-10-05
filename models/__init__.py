@@ -16,6 +16,10 @@ classes = {"User": User, "BaseModel": BaseModel,
            "City": City, "Amenity": Amenity,
            "Review": Review}
 
+tables = {"states": State, "cities": City,
+                "users": User, "places": Place,
+                "reviews": Review, "amenities": Amenity}
+
 if getenv("HBNB_TYPE_STORAGE") == "db":
     from models.engine.db_storage import DBStorage
     storage = DBStorage()
