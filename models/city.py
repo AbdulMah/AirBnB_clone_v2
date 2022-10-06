@@ -1,19 +1,14 @@
 #!/usr/bin/python3
 """ City Module for HBNB project """
-import os
-from models.base_model import BaseModel
-import sqlalchemy
+from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, ForeignKey
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
+from models.place import Place
 
 
-class City(BaseModel):
-    """ The city class, contains state ID and name
-    Attributes:
-        name: input name
-        state_id: input state id
-    """
+class City(BaseModel, Base):
+    """ The city class, contains state ID and name """
     __tablename__ = "cities"
-    state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
+    state_id = Column(String(60), ForeignKey("states.id"), nullable=False)
     name = Column(String(128), nullable=False)
-    places = relationship('Place', backref='cities', cascade="delete")
+    places = relationship("Place", cascade="all,delete", backref='cities')

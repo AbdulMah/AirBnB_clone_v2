@@ -1,88 +1,81 @@
 #!/usr/bin/python3
-"""This is the database storage class for AirBnB"""
-from models.user import User
-from models.state import State
-from models.city import City
-from models.amenity import Amenity
-from models.place import Place
-from models.review import Review
-import os
-from os import getenv
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import sessionmaker
-from models.base_model import Base
+"""This module defines a class to manage data base storage for hbnb clone"""
+from sqlalchemy import create_engine, MetaData
+from os import environ as env
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 
 class DBStorage:
-    """class Database Storage
-    """
+    """This class manages storage of hbnb models on a SQL DB"""
     __engine = None
     __session = None
 
     def __init__(self):
-        """Initializes an instance of class DBStorage.
-        """
-        HBNB_MYSQL_USER = getenv("HBNB_MYSQL_USER")
-        HBNB_MYSQL_PWD = getenv("HBNB_MYSQL_PWD")
-        HBNB_MYSQL_HOST = getenv("HBNB_MYSQL_HOST")
-        HBNB_MYSQL_DB = getenv("HBNB_MYSQL_DB")
-        HBNB_ENV = getenv("HBNB_ENV")
-
+        """ init """
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(
-            HBNB_MYSQL_USER, HBNB_MYSQL_PWD, HBNB_MYSQL_HOST,
-            HBNB_MYSQL_DB), pool_pre_ping=True)
-
-        # Drop all tables if HBNB_ENV is equal to test
-        if HBNB_ENV == "test":
-            Base.metadata.drop_all(bind=self.__engine)
+            env["HBNB_MYSQL_USER"],
+            env["HBNB_MYSQL_PWD"],
+            env["HBNB_MYSQL_HOST"],
+            env["HBNB_MYSQL_DB"]
+        ), pool_pre_ping=True)
+        if env.get("HBNB_ENV") == "test":
+            meta = MetaData(self.__engine)
+            meta.reflect()
+            meta.drop_all()
 
     def all(self, cls=None):
-        """Query on the current database session all objects depending
-        on the class name parameter. If cls=None, query all types of objects.
-        """
-        found_objects = {}
-        if cls is not None:
-            for instance in self.__session.query(eval(cls)).all():
-                key = "{}.{}".format(type(instance).__name__, instance.id)
-                found_objects[key] = instance
+        """ all """
+        from models.base_model import BaseModel
+        from models.user import User
+        from models.place import Place
+        from models.state import State
+        from models.city import City
+        from models.amenity import Amenity
+        from models.review import Review
+        refs = {
+                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
+                    'State': State, 'City': City, 'Amenity': Amenity,
+                    'Review': Review
+        }
+        classes = []
+        if cls is None:
+            classes.append(State)
+            classes.append(City)
         else:
-            tables = Base.__subclasses__()
-            for t in tables:
-                rows = self.__session.query(t).all()
-                for instance in rows:
-                    key = "{}.{}".format(type(instance).__name__, instance.id)
-                    found_objects[key] = instance
-        return found_objects
+            classes.append(refs[cls])
+        out = {}
+        for clas in classes:
+            quer = self.__session.query(clas).all()
+            for obj in quer:
+                key = "{}.{}".format(obj.__class__.__name__, obj.id)
+                print("KEY IS: {}".format(key))
+                out[key] = obj
+        return out
 
     def new(self, obj):
-        """Add the object to the current database session (self.__session)
-        """
+        """ new """
         self.__session.add(obj)
 
     def save(self):
-        """Commit all changes of the current database session (self.__session)
-        """
+        """ save """
         self.__session.commit()
 
     def delete(self, obj=None):
-        """Delete from the current database session obj if not None.
-        """
+        """ delete """
         if obj is not None:
-            for instance in self.__session.query(obj.__class__.__name__).all():
-                if obj == instance:
-                    self.__session.delete(obj)
-                    self.save()
+            self.__session.delete(obj)
 
     def reload(self):
-        """Create all tables in the database. Then create the current
-        database session from the engine (self.__session).
-        """
-        Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(bind=self.__engine,
-                                       expire_on_commit=False)
-        self.__session = scoped_session(session_factory)
+        """ reload """
+        from models.base_model import Base
+        from models.user import User
+        from models.place import Place
+        from models.state import State
+        from models.city import City
+        from models.amenity import Amenity
+        from models.review import Review
 
-    def close(self):
-        """close private session attribute"""
-        self.__session.remove()
+        Base.metadata.create_all(self.__engine)
+        Session = scoped_session(
+                 sessionmaker(expire_on_commit=False, bind=self.__engine))
+        self.__session = Session()
