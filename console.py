@@ -10,6 +10,8 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+import shlex
+from shlex import split
 
 
 class HBNBCommand(cmd.Cmd):
@@ -73,8 +75,8 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] == '{' and pline[-1] == '}'\
-                            and type(eval(pline)) == dict:
+                    if pline[0] is '{' and pline[-1] is '}'\
+                            and type(eval(pline)) is dict:
                         _args = pline
                     else:
                         _args = pline.replace(',', '')
@@ -113,53 +115,31 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
+    def do_create(self, line):
         """ Create an object of any class"""
-        # Check if the argument is empty
-        if not args:
+        tokens = shlex.split(line)
+
+        if not line or len(line) == 0:
             print("** class name missing **")
             return
-        # Split the argument into a list of arguments (on each space)
-        args_list = args.split()
-        class_name = args_list[0]
-
-        # We know that the first item of this argument list should be the class
-        # Check if the class exists
-        if class_name not in HBNBCommand.classes:
+        if tokens[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
 
-        # Create a new instance of the class
-        new_instance = HBNBCommand.classes[class_name]()
-
-        # contains the attribute to set to the class
-        # attribute and values are still separated by the `=` sign
-        attributes = args_list[1:]
-
-        # Go over all attributes and split keys and values from the `=` sign
-        for attribute in attributes:
-            key, value = attribute.split('=')
-            # Handle the formating (string, integer, float, underscore)
-            value = value.replace('_', ' ')
-
-            if value[0] == value[-1] == '"':
-                value = value[1:-1]
-            else:
-                # If value isn't in quotation marks
-                # it might be a numerical value
-                try:
-                    value = int(value)
-                except ValueError:
-                    try:
-                        value = float(value)
-                    except ValueError:
-                        pass  # If all fail, then it's a string
-
-            setattr(new_instance, key, value)
-
-        storage.save()
-        print(new_instance.id)
-        storage.save()
+        if len(tokens) == 1:
+            new_instance = HBNBCommand.classes[line]()
+            new_instance.save()
+            print(new_instance.id)
+        if len(tokens) > 1:
+            new_instance = HBNBCommand.classes[tokens[0]]()
+            pieces = dict(i.split('=') for i in tokens[1:])
+            for k, v in pieces.items():
+                if '_' in v:
+                    v = v.replace('_', ' ')
+                if hasattr(new_instance, k):
+                    setattr(new_instance, k, v)
+            new_instance.save()
+            print(new_instance.id)
 
     def help_create(self):
         """ Help information for the create method """
@@ -234,7 +214,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
-        print_list = []
+        obj_list = []
 
         if args:
             args = args.split(' ')[0]  # remove possible trailing args
@@ -243,12 +223,12 @@ class HBNBCommand(cmd.Cmd):
                 return
             for k, v in storage._FileStorage__objects.items():
                 if k.split('.')[0] == args:
-                    print_list.append(str(v))
+                    obj_list.append(str(v))
         else:
             for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
+                obj_list.append(str(v))
 
-        print(print_list)
+        print(obj_list)
 
     def help_all(self):
         """ Help information for the all command """
@@ -293,13 +273,13 @@ class HBNBCommand(cmd.Cmd):
         # generate key from class and id
         key = c_name + "." + c_id
 
-        # determine if key == present
+        # determine if key is present
         if key not in storage.all():
             print("** no instance found **")
             return
 
         # first determine if kwargs or args
-        if '{' in args[2] and '}' in args[2] and type(eval(args[2])) == dict:
+        if '{' in args[2] and '}' in args[2] and type(eval(args[2])) is dict:
             kwargs = eval(args[2])
             args = []  # reformat kwargs into list, ex: [<name>, <value>, ...]
             for k, v in kwargs.items():
@@ -307,7 +287,7 @@ class HBNBCommand(cmd.Cmd):
                 args.append(v)
         else:  # isolate args
             args = args[2]
-            if args and args[0] == '\"':  # check for quoted arg
+            if args and args[0] is '\"':  # check for quoted arg
                 second_quote = args.find('\"', 1)
                 att_name = args[1:second_quote]
                 args = args[second_quote + 1:]
@@ -315,10 +295,10 @@ class HBNBCommand(cmd.Cmd):
             args = args.partition(' ')
 
             # if att_name was not quoted arg
-            if not att_name and args[0] != ' ':
+            if not att_name and args[0] is not ' ':
                 att_name = args[0]
             # check for quoted val arg
-            if args[2] and args[2][0] == '\"':
+            if args[2] and args[2][0] is '\"':
                 att_val = args[2][1:args[2].find('\"', 1)]
 
             # if att_val was not quoted arg
