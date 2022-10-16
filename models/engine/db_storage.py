@@ -4,6 +4,13 @@ from sqlalchemy import create_engine, MetaData
 from models.base_model import Base
 from os import environ as env
 from sqlalchemy.orm import sessionmaker, scoped_session
+from models.base_model import BaseModel
+from models.user import User
+from models.place import Place
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
 
 
 class DBStorage:
@@ -26,17 +33,11 @@ class DBStorage:
 
     def all(self, cls=None):
         """ all """
-        from models.base_model import BaseModel
-        from models.user import User
-        from models.place import Place
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.review import Review
+        
         refs = {
-                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
-                    'State': State, 'City': City, 'Amenity': Amenity,
-                    'Review': Review
+            'BaseModel': BaseModel, 'User': User, 'Place': Place,
+            'State': State, 'City': City, 'Amenity': Amenity,
+            'Review': Review
         }
         classes = []
         if cls is None:
@@ -70,12 +71,11 @@ class DBStorage:
         """ reload """
         Base.metadata.create_all(self.__engine)
         Session = scoped_session(
-                 sessionmaker(expire_on_commit=False, bind=self.__engine))
+            sessionmaker(expire_on_commit=False, bind=self.__engine))
         self.__session = Session()
 
-    def close(self): 
+    def close(self):
         """Close, call reload to deserialize the json file to obj
         """
         self.__session.__class__.close(self.__session)
         self.reload()
-        
