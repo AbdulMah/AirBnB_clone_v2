@@ -13,7 +13,7 @@ env.key_filename = "~/id_rsa"
 
 def do_clean(number=0):
     """deletes out-of-date archives"""
-    
+
     local('ls -t ~/AirBnB_Clone_V2/versions/').split()
     with cd("/data/web_static/releases"):
         target_R = sudo("ls -t .").split()

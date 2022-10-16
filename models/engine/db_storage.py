@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """This module defines a class to manage data base storage for hbnb clone"""
 from sqlalchemy import create_engine, MetaData
+from models.base_model import Base
 from os import environ as env
 from sqlalchemy.orm import sessionmaker, scoped_session
 
@@ -67,15 +68,14 @@ class DBStorage:
 
     def reload(self):
         """ reload """
-        from models.base_model import Base
-        from models.user import User
-        from models.place import Place
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.review import Review
-
         Base.metadata.create_all(self.__engine)
         Session = scoped_session(
                  sessionmaker(expire_on_commit=False, bind=self.__engine))
         self.__session = Session()
+
+    def close(self): 
+        """Close, call reload to deserialize the json file to obj
+        """
+        self.__session.__class__.close(self.__session)
+        self.reload()
+        

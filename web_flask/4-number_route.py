@@ -38,4 +38,4 @@ def num_display(n):
     return "{} is a number".format(n)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0', port=5000)
