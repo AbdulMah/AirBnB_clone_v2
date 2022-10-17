@@ -12,6 +12,12 @@ from flask import render_template
 app = Flask(__name__)
 
 
+@app.teardown_appcontext
+def teardown(exc):
+    """Remove the current SQLAlchemy session."""
+    storage.close()
+
+
 @app.route("/hbnb_filters", strict_slashes=False)
 def hbnb_filters():
     """Displays the main HBnB filters HTML page."""
@@ -21,11 +27,5 @@ def hbnb_filters():
                            states=states, amenities=amenities)
 
 
-@app.teardown_appcontext
-def teardown(exc):
-    """Remove the current SQLAlchemy session."""
-    storage.close()
-
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", port=5000)
