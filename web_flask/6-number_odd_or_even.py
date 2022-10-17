@@ -46,8 +46,7 @@ def num_html(n):
 
 @app.route('/number_odd_or_even/<int:n>', strict_slashes=False)
 def num_html_even_odd(n):
-    """display HTML is "n" is a number only
-    H1 tag: Number: n is even|odd"""
+    """display HTML is "n" is a number only, H1"""
     return render_template('6-number_odd_or_even.html', name=n)
 
 
