@@ -3,8 +3,7 @@
 
 
 # MAHAMAN MALAM Abdoulkarim<amahamn@gmail.com>
-# Atuhaire Collins, no feedback and response
-
+# ABENEZER GOLDA, no feedback and response
 0x00. AirBnB clone - The console
 # This file lists all individuals having contributed content to the respository.
 
