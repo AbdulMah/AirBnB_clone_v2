@@ -11,6 +11,7 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+from models import refs_classes
 
 
 class DBStorage:
@@ -32,27 +33,20 @@ class DBStorage:
             meta.drop_all()
 
     def all(self, cls=None):
-        """ all """
-        
-        refs = {
-            'BaseModel': BaseModel, 'User': User, 'Place': Place,
-            'State': State, 'City': City, 'Amenity': Amenity,
-            'Review': Review
-        }
-        classes = []
-        if cls is None:
-            classes.append(State)
-            classes.append(City)
+        """returns a dictionary of all the objects present"""
+        if not self.__session:
+            self.reload()
+        objects = {}
+        if isinstance(cls, str):
+            cls = refs_classes.get(cls, None)
+        if cls:
+            for obj in self.__session.query(cls):
+                objects[obj.__class__.__name__ + '.' + obj.id] = obj
         else:
-            classes.append(refs[cls])
-        out = {}
-        for clas in classes:
-            quer = self.__session.query(clas).all()
-            for obj in quer:
-                key = "{}.{}".format(obj.__class__.__name__, obj.id)
-                print("KEY IS: {}".format(key))
-                out[key] = obj
-        return out
+            for cls in refs.values():
+                for obj in self.__session.query(cls):
+                    objects[obj.__class__.__name__ + '.' + obj.id] = obj
+        return objects
 
     def new(self, obj):
         """ new """
@@ -79,3 +73,24 @@ class DBStorage:
         """
         self.__session.__class__.close(self.__session)
         self.reload()
+        
+    def get(self, cls, id): 
+        """Retrieve the object"""
+        if cls is not None  and isinstance(cls, str) and \
+            id != None and isinstance(id, str) and cls in refs_classes:
+            cls = refs_classes[cls]   
+            result = self.__session.query(cls).filter(cls.id == id).first()
+            return result
+        return None
+    
+    def count(self, cls=None):
+        """Count number of objects in storage"""
+        total = 0
+        if isinstance(cls, str) and cls in refs_classes:
+            cls = refs_classes[cls]
+            total = self.__session.query(cls).count()
+        elif cls is None:
+            for cls in refs.values():
+                total += self.__session.query(cls).count()
+        return total
+    

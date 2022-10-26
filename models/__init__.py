@@ -10,6 +10,8 @@ from models.user import User
 from models.review import Review
 from models.state import State
 
+refs_classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
+           "Place": Place, "Review": Review, "State": State, "User": User}
 
 if getenv("HBNB_TYPE_STORAGE") == "db":
     from models.engine.db_storage import DBStorage

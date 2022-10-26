@@ -11,9 +11,7 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
- 
-classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
-           "Place": Place, "Review": Review, "State": State, "User": User}
+from models import refs_classes
 
 
 class FileStorage:
@@ -26,13 +24,14 @@ class FileStorage:
 
     def all(self, cls=None):
         """returns the dictionary __objects"""
-        if cls is not None:
-            new_dict = {}
-            for key, value in self.__objects.items():
-                if cls == value.__class__ or cls == value.__class__.__name__:
-                    new_dict[key] = value
-            return new_dict
-        return self.__objects
+        if not cls:
+            return self.__objects
+        elif isinstance(cls, str):
+            return {k: v for k, v in self.__objects.items()
+                    if v.__class__.__name__ == cls}
+        else:
+            return {k: v for k, v in self.__objects.items()
+                    if v.__class__ == cls}
 
     def new(self, obj):
         """sets in __objects the obj with key <obj class name>.id"""
@@ -54,7 +53,7 @@ class FileStorage:
             with open(self.__file_path, 'r') as f:
                 jo = json.load(f)
             for key in jo:
-                self.__objects[key] = classes[jo[key]["__class__"]](**jo[key])
+                self.__objects[key] = refs_classes[jo[key]["__class__"]](**jo[key])
         except:
             pass
 
@@ -68,3 +67,24 @@ class FileStorage:
     def close(self):
         """call reload method for deserializing the JSON file to objects"""
         self.reload()
+
+
+    def get(self, cls, id):
+        """Retrieve the object"""
+        if cls is not None and isinstance(cls, str) and\
+            id is not None and\
+           isinstance(id, str) and cls in refs_classes:
+            key = cls + '.' + id
+            obj = self.__objects.get(key, None)
+            return obj
+        else:
+            return None
+
+    def count(self, cls=None):
+        """Count number of objects in storage"""
+        total = 0
+        if isinstance(cls, str) and cls in refs_classes:
+            total = len(self.all(cls))
+        elif cls is None:
+            total = len(self.__objects)
+        return total
